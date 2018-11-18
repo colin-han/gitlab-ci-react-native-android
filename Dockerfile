@@ -54,12 +54,18 @@ RUN echo "Installing Yarn Deb Source" \
 	&& echo "deb http://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
 RUN echo "Installing Node.JS" \
-	&& curl -sL https://deb.nodesource.com/setup_9.x | bash -
+	&& curl -sL https://deb.nodesource.com/setup_10.x | bash -
 
-ENV BUILD_PACKAGES git yarn nodejs build-essential imagemagick librsvg2-bin ruby ruby-dev wget libcurl4-openssl-dev
+ENV BUILD_PACKAGES git yarn nodejs build-essential imagemagick librsvg2-bin ruby ruby-dev wget libcurl4-openssl-dev locales
 RUN echo "Installing Additional Libraries" \
 	 && rm -rf /var/lib/gems \
-	 && apt-get update && apt-get install $BUILD_PACKAGES -qqy --no-install-recommends
+	 && apt-get update && apt-get install $BUILD_PACKAGES -qqy --no-install-recommends \
+	 && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+	 
+RUN echo "Change locale" \
+	&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+
+ENV LANG en_US.UTF-8
 
 RUN echo "Installing Fastlane 2.61.0" \
 	&& gem install fastlane badge -N \
